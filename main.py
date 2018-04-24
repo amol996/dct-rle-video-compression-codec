@@ -68,7 +68,7 @@ if __name__ == "__main__":
         show_frame("recon.dat", 0)
         print(mse, compare_file_sizes(args.input_filename, "hufcompressed.dat"))
     elif args.compression_type == "rle":
-        scompress.compress_yuv(args.input_filename, "rlecompressed.dat", frame_diff=flag)
+        compress.compress_yuv(args.input_filename, "rlecompressed.dat", frame_diff=flag)
         uncompress.uncompress_yuv("rlecompressed.dat", "rlerecon.dat", frame_diff=flag)
         mse = compare_frames(args.input_filename, "rlerecon.dat")
         show_frame("recon.dat", 0)
