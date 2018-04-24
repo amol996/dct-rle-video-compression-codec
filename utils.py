@@ -29,7 +29,7 @@ def get_quant_matrix(q):
     Ts[Ts == 0] = 1
     return Ts.astype(int)
 
-Q = get_quant_matrix(75)
+Q = get_quant_matrix(50)
 
 def frame_differences(frames):
     cur = np.zeros(frames[0].shape)
