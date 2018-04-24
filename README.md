@@ -7,7 +7,7 @@ You can compress and uncompress files with or without making using frame differe
 * python main.py <compress_flag (c/n)> <frame_diff_flag (y/n)> <input_filename> <output_filename>
 
 ### Example
-Compressing a yuv file without using frame differences
+* Compressing a yuv file without using frame differences
 * python main.py c n bunny.450p.yuv bunny.450p.compressed.txt
-Uncompressing the same file
+* Uncompressing the same file
 * python main.py n n bunny.450p.compressed.txt bunny.450p.recon.dat
