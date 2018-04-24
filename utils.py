@@ -1,4 +1,6 @@
 import numpy as np
+import cv2
+import os
 
 # vars
 BLOCK_SIZE = 8
@@ -18,6 +20,17 @@ Q = np.array([
     [72,92,95,98,112,100,103,99]
 ])
 
+def get_quant_matrix(q):
+    if q < 50:
+        S = 5000.0/q
+    else:
+        S = 200-2.0*q
+    Ts = np.floor((S*Q+50)/100.0)
+    Ts[Ts == 0] = 1
+    return Ts.astype(int)
+
+Q = get_quant_matrix(75)
+
 def frame_differences(frames):
     cur = np.zeros(frames[0].shape)
     res = []
@@ -33,3 +46,34 @@ def recon_frame_differences(diffs):
         frames.append(cur+diff)
         cur = frames[-1]
     return frames
+
+def read_frame(f, width, height):
+    size = width*height
+    raw = f.read(size)
+    yuv = np.frombuffer(raw, dtype=np.uint8)
+    yuv = yuv.reshape((height, width))
+    return yuv
+
+def read_yuv(filename, width=WIDTH, height=HEIGHT, n=NUM_FRAMES):
+    frames = []
+    f = open(filename, "rb")
+    for i in range(n):
+        print("%s | read frame %d" % (filename, i))
+        frames.append(read_frame(f, width, height))
+    return frames
+
+def compare_frames(ori_filename, recon_filename):
+    ori_frames = read_yuv(ori_filename)
+    recon_frames = read_yuv(recon_filename)
+    mse = []
+    for ori, recon in zip(ori_frames, recon_frames):
+        mse.append(np.mean((ori-recon)**2))
+    return np.mean(mse)
+
+def compare_file_sizes(uncompressed, compressed):
+    return os.path.getsize(uncompressed)/float(os.path.getsize(compressed))
+
+def show_frame(filename, i):
+    frames = read_yuv(filename)
+    cv2.imshow("frame", frames[i])
+    cv2.waitKey()

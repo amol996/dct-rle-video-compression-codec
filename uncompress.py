@@ -3,6 +3,7 @@ import cv2
 import decode
 import math
 from utils import *
+from dahuffman import HuffmanCodec
 
 # get blocked size
 
@@ -47,6 +48,27 @@ def uncompress_yuv(filename, out_filename, width=WIDTH, height=HEIGHT, frame_dif
         decoded = uncompress(frame, width, height)
         res.append(decoded[:HEIGHT,:WIDTH])
         print("%s | uncompressed frame %d" % (filename, i))
+    if frame_diff:
+        res = recon_frame_differences(res)
+    cv2.imwrite("compressed_image.bmp", res[0])
+    f = open(out_filename, "wb")
+    f.write(np.uint8(np.array(res)))
+    f.close()
+    print("%s saved" % out_filename)
+
+def uncompress_yuv_using_huffman(filename, out_filename, model, frame_diff=False):
+    width, height = get_actual_size(WIDTH, HEIGHT)
+    f = open(filename, "rb")
+    res = []
+    for i in range(len(model)):
+        codec, size = model[i]
+        raw = f.read(size)
+        raw = codec.decode(raw)
+        temp = np.reshape(np.array(raw), (height, width))
+        decoded = decode.decode(temp, width, height)
+        res.append(decoded[:HEIGHT,:WIDTH])
+        print("%s | uncompressed frame %d" % (filename, i))
+    f.close()
     if frame_diff:
         res = recon_frame_differences(res)
     cv2.imwrite("compressed_image.bmp", res[0])

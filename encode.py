@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import math
 
+from dahuffman import HuffmanCodec
 from zigzag import *
 from utils import *
 
@@ -69,7 +70,12 @@ def dct(frame, block_size=BLOCK_SIZE):
 
 # dct then rle
 
-def encode(frame):
+def encode(frame, huffman=False):
     dct_frame = dct(frame)
-    rle_frame = rle(dct_frame.flatten())
-    return rle_frame
+    if not huffman:
+        rle_frame = rle(dct_frame.flatten())
+        return rle_frame
+    else:
+        codec = HuffmanCodec.from_data(dct_frame.flatten())
+        rle_frame = codec.encode(dct_frame.flatten())
+        return rle_frame, codec
